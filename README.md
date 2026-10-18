@@ -2,8 +2,8 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Optimization: SLSQP](https://img.shields.io/badge/Optimization-SLSQP%20%7C%20Exact%20Gradient-brightgreen.svg)]()
-[![Econometrics: SSD](https://img.shields.io/badge/Econometrics-Stochastic%20Dominance-orange.svg)]()
+[![Optimization: SLSQP](https://img.shields.io/badge/Optimization-SLSQP%20%7C%20Exact%20Gradient-brightgreen.svg)](#)
+[![Econometrics: SSD](https://img.shields.io/badge/Econometrics-Stochastic%20Dominance-orange.svg)](#)
 
 A high-dimensional quantitative portfolio optimization and operational research framework for re-engineering mega-cap equity benchmarks (**S&P 500**, $N \approx 500$, and **Nasdaq-100**, $N \approx 100$) away from market-capitalization weighting toward **Maximum Effective Number of Bets (Max-ENB)**. 
 
@@ -60,32 +60,65 @@ This repository implements a non-linear mathematical programming engine to maxim
 Let $R \in \mathbb{R}^N$ be the return vector with covariance matrix $\Sigma$, correlation matrix $C$, and diagonal standard deviation matrix $D = \text{diag}(\sigma_1, \dots, \sigma_N)$. 
 
 To decompose the $N$ correlated assets into $N$ orthogonal risk factors $\tilde{F} = T R$ such that $\text{Cov}(\tilde{F}) = I_N$, standard Principal Component Analysis (PCA) produces volatile, economically uninterpretable rotations. Meucci, Santangelo, & Deguest (2013) formulate **Minimum Linear Torsion (MLT)** by minimizing the tracking error between original assets and uncorrelated factors:
-$$\min_{T \in \mathbb{R}^{N \times N}} \|T - D^{-1}\|_F^2 \quad \text{subject to} \quad T \Sigma T^T = I_N$$
+
+$$
+\min_{T \in \mathbb{R}^{N \times N}} \|T - D^{-1}\|_F^2 \quad \text{subject to} \quad T \Sigma T^T = I_N
+$$
 
 The analytical solution is the **inverse of the symmetric Riccati root** of the correlation matrix:
-$$C = E \Lambda E^T \implies C^{1/2} = E \Lambda^{1/2} E^T$$
-$$T_{MT} = \left(C^{1/2}\right)^{-1} D^{-1} = E \Lambda^{-1/2} E^T D^{-1}$$
+
+$$
+C = E \Lambda E^T \implies C^{1/2} = E \Lambda^{1/2} E^T
+$$
+
+$$
+T_{MT} = \left(C^{1/2}\right)^{-1} D^{-1} = E \Lambda^{-1/2} E^T D^{-1}
+$$
 
 ### Step 2: Orthogonal Risk Contributions
 For any asset allocation $w \in \mathbb{R}^N$, exposures to the orthogonal minimum-torsion bets are:
-$$\tilde{w} = \left(T_{MT}^{-1}\right)^T w = D C^{1/2} w$$
+
+$$
+\tilde{w} = \left(T_{MT}^{-1}\right)^T w = D C^{1/2} w
+$$
+
 Total portfolio variance decomposes orthogonally into:
-$$\sigma_p^2 = w^T \Sigma w = \tilde{w}^T \tilde{w} = \sum_{k=1}^N \tilde{w}_k^2$$
+
+$$
+\sigma_p^2 = w^T \Sigma w = \tilde{w}^T \tilde{w} = \sum_{k=1}^N \tilde{w}_k^2
+$$
+
 The relative risk contribution of each independent bet $k$ is:
-$$p_k(w) = \frac{\tilde{w}_k^2}{\sum_{j=1}^N \tilde{w}_j^2} = \frac{\tilde{w}_k^2}{w^T \Sigma w}, \quad \sum_{k=1}^N p_k(w) = 1, \quad p_k(w) \ge 0$$
+
+$$
+p_k(w) = \frac{\tilde{w}_k^2}{\sum_{j=1}^N \tilde{w}_j^2} = \frac{\tilde{w}_k^2}{w^T \Sigma w}, \quad \sum_{k=1}^N p_k(w) = 1, \quad p_k(w) \ge 0
+$$
 
 ### Step 3: Constrained Shannon Entropy Maximization
-We maximize the **Effective Number of Bets ($\text{ENB}$)**:
-$$\text{ENB}(w) = \exp\left( -\sum_{k=1}^N p_k(w) \ln p_k(w) \right)$$
+We maximize the **Effective Number of Bets (ENB)**:
+
+$$
+\text{ENB}(w) = \exp\left( -\sum_{k=1}^N p_k(w) \ln p_k(w) \right)
+$$
 
 Equivalent to the Non-Linear Program (NLP):
-$$\min_{w \in \mathbb{R}^N} \quad \Phi(w) = \sum_{k=1}^N p_k(w) \ln p_k(w)$$
-$$\text{subject to:} \quad \mathbf{1}^T w = 1, \quad 0 \le w_i \le w_{\max}, \quad \forall i$$
+
+$$
+\min_{w \in \mathbb{R}^N} \quad \Phi(w) = \sum_{k=1}^N p_k(w) \ln p_k(w)
+$$
+
+$$
+\text{subject to:} \quad \mathbf{1}^T w = 1, \quad 0 \le w_i \le w_{\max}, \quad \forall i
+$$
 
 ### Step 4: Exact Machine-Precision Analytical Gradient
 To ensure rapid, robust numerical convergence for $N=500$, we derived and implemented the exact analytical gradient passed directly to the SLSQP optimizer:
-$$\frac{\partial \Phi}{\partial w} = \frac{2}{\sigma_p^2} \left[ M^T \left( (1 + \ln p) \odot \tilde{w} \right) - \left( \sum_{k=1}^N p_k (1 + \ln p_k) \right) M^T \tilde{w} \right]$$
-where $M = D C^{1/2}$ and $\odot$ is the Hadamard product.
+
+$$
+\frac{\partial \Phi}{\partial w} = \frac{2}{\sigma_p^2} \left[ M^T \big( (1 + \ln p) \odot \tilde{w} \big) - \left( \sum_{k=1}^N p_k (1 + \ln p_k) \right) M^T \tilde{w} \right]
+$$
+
+where $M = D C^{1/2}$ and $\odot$ is the Hadamard element-wise product.
 
 ---
 
@@ -93,14 +126,14 @@ where $M = D C^{1/2}$ and $\odot$ is the Hadamard product.
 
 All backtests were executed walk-forward with **zero lookahead bias** on 100% real OHLCV data from 2017 to 2026 ($2,456$ trading days), re-estimating covariance matrices out-of-sample over 252-day rolling windows.
 
-### A. Performance Summary (Uncapped Institutional Allocation, Frictionless)
+### Performance Summary (Uncapped Institutional Allocation, Frictionless)
 
-| Index Universe | Strategy / Benchmark | Annual Return | Volatility | Sharpe ($R_f=2\%$) | Sortino | Max Drawdown | Total Return | Avg ENB |
+| Index Universe | Strategy / Benchmark | Annual Return | Volatility | Sharpe (Rf=2%) | Sortino | Max Drawdown | Total Return | Avg ENB |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Nasdaq-100** | **Max-ENB (Pure Uncapped)** | **18.27%** | **16.69%** | **0.975** | **1.18** | **-30.25%** | **+331.3%** | **83.7 / 85** |
 | | Cap-Weighted (`QQQ`) | 20.65% | 23.81% | 0.784 | 1.03 | -35.12% | +368.1% | ~4.5 / 85 |
 | | Equal-Weighted (`QQQE`) | 14.79% | 21.92% | 0.584 | 0.77 | -32.15% | +192.5% | ~12.0 / 85 |
-| **S&P 500 ($N=476$)** | **Max-ENB (Pure Uncapped)** | **13.78%** | **15.38%** | **0.766** | **0.86** | **-35.48%** | **+197.8%** | **467.2 / 476** |
+| **S&P 500 (N=476)** | **Max-ENB (Pure Uncapped)** | **13.78%** | **15.38%** | **0.766** | **0.86** | **-35.48%** | **+197.8%** | **467.2 / 476** |
 | | Cap-Weighted (`SPY`) | 15.26% | 19.04% | 0.696 | 0.86 | -33.72% | +220.4% | ~8.0 / 476 |
 | | Equal-Weighted (`RSP`) | 12.18% | 19.36% | 0.526 | 0.65 | -39.04% | +144.0% | ~35.0 / 476 |
 
@@ -109,18 +142,21 @@ All backtests were executed walk-forward with **zero lookahead bias** on 100% re
 ## 4. Second-Order Stochastic Dominance (SSD) Empirical Tests
 
 Using the non-parametric framework of **Davidson & Duclos (2000)** and **Barrett & Donald (2003)**, we test whether the integrated shortfall of Max-ENB is uniformly lower than the benchmark:
-$$D^{(2)}(z) = \frac{1}{T} \sum_{t=1}^T \max(0, z - R_t)$$
+
+$$
+D^{(2)}(z) = \frac{1}{T} \sum_{t=1}^T \max(0, z - R_t)
+$$
 
 ![Stochastic Dominance Results](results/figures/uncapped_stochastic_dominance_charts.png)
 
 ### Formal SSD Test Statistics
 
-| Comparison | % Grid Max-ENB Lower Risk | Downside Risk Reduction | Min DD $t$-stat | Max DD $t$-stat | Max Violation | Bootstrap $p$-value | Empirical Verdict |
+| Comparison | % Grid Max-ENB Lower Risk | Downside Risk Reduction | Min DD t-stat | Max DD t-stat | Max Violation | Bootstrap p-value | Empirical Verdict |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **S&P 500 Max-ENB vs. Equal-Weight (`RSP`)** | **99.6%** | **+0.60%** | **-17.79** | **0.00** | **0.000000** | **$p = 0.996$** | **STRICT SECOND-ORDER STOCHASTIC DOMINANCE (SSD)** |
-| **Nasdaq Max-ENB vs. Equal-Weight (`QQQE`)** | **70.4%** | **+0.93%** | **-18.10** | +1.41 | 0.000012 | $p = 0.548$ | **Near-Total SSD Dominance ($t = -18.10$ in losses)** |
-| **Nasdaq Max-ENB vs. Cap-Weight (`QQQ`)** | **34.8%** | **+0.64%** | **-17.44** | +1.41 | 0.000095 | $p = 0.000$ | **Downside/Loss SSD Dominance (Crossover in far right tail)** |
-| **S&P 500 Max-ENB vs. Cap-Weight (`SPY`)** | **39.2%** | **+0.34%** | **-13.45** | +1.41 | 0.000058 | $p = 0.000$ | **Downside/Loss SSD Dominance (Crossover in far right tail)** |
+| **S&P 500 Max-ENB vs. Equal-Weight (`RSP`)** | **99.6%** | **+0.60%** | **-17.79** | **0.00** | **0.000000** | **p = 0.996** | **STRICT SECOND-ORDER STOCHASTIC DOMINANCE (SSD)** |
+| **Nasdaq Max-ENB vs. Equal-Weight (`QQQE`)** | **70.4%** | **+0.93%** | **-18.10** | +1.41 | 0.000012 | p = 0.548 | **Near-Total SSD Dominance (t = -18.10 in losses)** |
+| **Nasdaq Max-ENB vs. Cap-Weight (`QQQ`)** | **34.8%** | **+0.64%** | **-17.44** | +1.41 | 0.000095 | p = 0.000 | **Downside/Loss SSD Dominance (Crossover in far right tail)** |
+| **S&P 500 Max-ENB vs. Cap-Weight (`SPY`)** | **39.2%** | **+0.34%** | **-13.45** | +1.41 | 0.000058 | p = 0.000 | **Downside/Loss SSD Dominance (Crossover in far right tail)** |
 
 ### Econometric Interpretations
 1. **Unconditional SSD over Equal-Weighting:**  
