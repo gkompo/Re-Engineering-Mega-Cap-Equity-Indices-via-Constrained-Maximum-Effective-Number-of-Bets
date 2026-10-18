@@ -1,0 +1,5 @@
+,Annualized Return,Annualized Volatility,Sharpe Ratio (Rf=2%),Sortino Ratio,Max Drawdown,Calmar Ratio,Total Return,Avg ENB,Avg Turnover
+Monthly (21d),13.35%,15.44%,0.73,0.84,-35.56%,0.38,186.50%,467.0 / 476,38.7%
+Quarterly (63d),13.31%,15.93%,0.71,0.80,-37.48%,0.36,177.87%,467.1 / 476,66.0%
+Benchmark SPY (Cap-Weighted),15.26%,19.04%,0.70,0.86,-33.72%,0.45,220.44%,,
+Benchmark RSP (Equal-Weighted),12.18%,19.36%,0.53,0.65,-39.04%,0.31,143.98%,,

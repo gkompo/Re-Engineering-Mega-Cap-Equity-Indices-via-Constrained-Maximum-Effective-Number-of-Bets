@@ -1,0 +1,5 @@
+Comparison,Mean Return (X),Mean Return (Y),Vol (X),Vol (Y),Downside Shortfall Reduction,% Grid X Lower Risk,Min DD t-stat,Max DD t-stat,Max Viol (X dom Y),Max Viol (Y dom X),KS Stat (X dom Y),Bootstrap p-value
+Nasdaq Max-ENB (Uncapped) vs. Nasdaq Equal-Weight (QQQE),18.27%,14.79%,16.69%,21.92%,0.93%,70.4%,-18.10,1.41,0.000012,0.001512,0.0005,0.548
+Nasdaq Max-ENB (Uncapped) vs. Nasdaq Cap-Weight (QQQ),18.27%,20.65%,16.69%,23.81%,0.64%,34.8%,-17.44,1.41,0.000095,0.001818,0.0044,0.000
+S&P 500 Max-ENB (Uncapped) vs. S&P 500 Equal-Weight (RSP),13.78%,12.18%,15.38%,19.36%,0.60%,99.6%,-17.79,0.00,0.000000,0.001009,0.0000,0.996
+S&P 500 Max-ENB (Uncapped) vs. S&P 500 Cap-Weight (SPY),13.78%,15.26%,15.38%,19.04%,0.34%,39.2%,-13.45,1.41,0.000058,0.000891,0.0027,0.000

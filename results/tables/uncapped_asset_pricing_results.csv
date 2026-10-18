@@ -1,0 +1,5 @@
+,Sharpe Ratio (X),Sharpe Ratio (Y),Sharpe Diff z-stat,Sharpe Diff p-val,Annualized Alpha,Alpha t-stat,Alpha p-val,Market Beta,Downside Beta,Upside Beta,Max Drawdown (X),Max Drawdown (Y),VaR 95% (X),VaR 95% (Y),CVaR 95% (X),CVaR 95% (Y)
+NDX Uncapped vs QQQ (Cap),0.975,0.784,12.71,0.0000,5.81%,0.03,0.0000,0.60,0.70,0.64,-30.25%,-35.12%,22.36%,37.88%,38.46%,55.74%
+NDX Uncapped vs QQQE (Equal),0.975,0.584,30.41,0.0000,8.05%,0.05,0.0000,0.69,0.78,0.72,-30.25%,-32.15%,22.36%,33.98%,38.46%,51.05%
+SP500 Uncapped vs SPY (Cap),0.766,0.696,6.24,0.0000,2.56%,0.01,0.0000,0.74,0.83,0.75,-35.48%,-33.72%,20.93%,28.03%,36.11%,45.78%
+SP500 Uncapped vs RSP (Equal),0.766,0.526,26.76,0.0000,4.62%,0.03,0.0000,0.75,0.83,0.74,-35.48%,-39.04%,20.93%,26.63%,36.11%,45.83%
